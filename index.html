@@ -1,0 +1,154 @@
+<!--
+Dirty hack that helps designing/viewing bitmap fonts
+Copyright (C) 2025 Jaroslav Škarvada <jskarvad@redhat.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html>
+<head>
+<style>
+td.set
+{
+  background-color: #000000;
+}
+
+td.clear
+{
+  background-color: #ffffff;
+}
+
+table
+{
+  cursor: pointer;
+}
+td
+{
+  width: 50px;
+}
+tr
+{
+  height: 50px;
+}
+</style>
+<script language="javascript">
+rows = 11;
+cols = 8;
+
+function set()
+{
+  var tbl = document.getElementById("matrix");
+  var box = document.getElementById("box");
+  var re = new RegExp("^[0-9a-f]{" + rows * 2 + "}$", "i");
+  var i = 0;
+  var num = 0;
+  var s = "";
+
+  if (tbl != null && box != null)
+  {
+    s = box.value;
+    if(re.test(s))
+    {
+      for (var y = 0; y < tbl.rows.length; y++)
+      {
+        num = parseInt(s.substring(y * 2, y * 2 + 2), 16);
+        i = cols - 1;
+        for (var x = 0; x < tbl.rows[y].cells.length; x++)
+        {
+          if (num >> i)
+          {
+            tbl.rows[y].cells[x].className = "set";
+            num -= 1 << i;
+          }
+          else
+            tbl.rows[y].cells[x].className = "clear";
+          i--;
+        }
+      }
+    }
+    else
+      alert("Invalid value.");
+  }
+  return false;
+}
+
+function calc()
+{
+  var tbl = document.getElementById("matrix");
+  var box = document.getElementById("box");
+  var i = 0;
+  var num = 0;
+  var s = "";
+
+  if (tbl != null && box != null)
+  {
+    for (var y = 0; y < tbl.rows.length; y++)
+    {
+      i = 1 << (cols - 1);
+      num = 0;
+      for (var x = 0; x < tbl.rows[y].cells.length; x++)
+      {
+        if (tbl.rows[y].cells[x].className == "set")
+          num += i;
+        i = i >> 1;
+      }
+      s += num.toString(16).padStart(2, '0').toUpperCase();
+    }
+    box.value = s;
+  }
+}
+
+function click(obj)
+{
+ if (obj.className == "set")
+   obj.className = "clear";
+ else
+   obj.className = "set";
+ calc();
+}
+
+//tbl.rows[y].cells.length
+function init()
+{
+  var tbl = document.createElement("table");
+  tbl.id = "matrix";
+  tbl.border = "1";
+  for (var y = 0; y < rows; y++)
+  {
+    tbl.insertRow(-1);
+    for (var x = 0; x < cols; x++)
+    {
+      tbl.rows[y].insertCell(-1);
+      tbl.rows[y].cells[x].className="clear";
+      tbl.rows[y].cells[x].onclick = function() { click(this); };
+//      tbl.rows[y].cells[x].setAttribute("data-y", y);
+//      tbl.rows[y].cells[x].setAttribute("data-x", x);
+    }
+  }
+  document.body.appendChild(tbl);
+  calc();
+}
+</script>
+</head>
+<body onload="init()">
+<noscript>
+Please enable JavaScript.
+</noscript>
+<p>
+<form onsubmit="return set()">
+<input type="text" size="22" id="box"/>
+<input type="submit"/>
+</form>
+</p>
+</body>
+</html>
