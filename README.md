@@ -3,6 +3,9 @@ Dirty hack that helps designing/viewing bitmap fonts. It can help when working
 with the LED matrix displays. It's by default for 8x11 displays, but it can
 be easily changed with `cols` and `rows` parameters in the JavaScript code.
 
+Run it in your browser:
+https://yarda.github.io/BMPFontDesigner/
+
 # Author
 Copyright (C) 2025 Jaroslav Škarvada <jskarvad@redhat.com>
 
